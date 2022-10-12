@@ -6,20 +6,26 @@ User = get_user_model()
 
 class Group(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(primary_key=True)
-    description = models.TextField(max_length=322)
+    slug = models.SlugField(unique=True)
+    description = models.TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
 class Post(models.Model):
-    text = models.TextField()
+    text = models.TextField(blank=True)
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='posts'
+        User, on_delete=models.CASCADE, related_name='posts'
     )
-    group = models.ForeignKey(Group, on_delete=models.CASCADE,
-                              related_name="posts", blank=True, null=True)
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='posts',
+    )
+
+    class Meta:
+        ordering = ('-pub_date',)
